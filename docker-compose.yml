@@ -1,0 +1,53 @@
+# for local development
+version: "3.3"
+services:
+  db:
+    image: "mariadb:latest"
+    restart: 'always'
+    environment:
+      MARIADB_ROOT_PASSWORD: "${MARIADB_ROOT_PASSWORD}"
+      MARIADB_DATABASE: "${MARIADB_DATABASE}"
+      MARIADB_USER: "${MARIADB_USER}"
+      MARIADB_PASSWORD: "${MARIADB_PASSWORD}"
+  api:
+    image: registry.digitalocean.com/pooperhub/pooper/api:latest
+    depends_on:
+      - db
+    restart: always
+    environment:
+      API_BASE_URL: "${API_BASE_URL}"
+      API_ROOT_PATH: "${API_ROOT_PATH}"
+      CLIENT_BASE_URL: "${CLIENT_BASE_URL}"
+      API_SECRET_AUTH_KEY: "${API_SECRET_AUTH_KEY}"
+      SENDER_EMAIL_ADDRESS: "${SENDER_EMAIL_ADDRESS}"
+      SENDGRID_API_KEY: "${SENDGRID_API_KEY}"
+      MARIADB_SERVER: "${MARIADB_SERVER}"
+      MARIADB_DATABASE: "${MARIADB_DATABASE}"
+      MARIADB_USER: "${MARIADB_USER}"
+      MARIADB_PASSWORD: "${MARIADB_PASSWORD}"
+      VAPID_PUBLIC_KEY: "${VAPID_PUBLIC_KEY}"
+      VAPID_PRIVATE_KEY: "${VAPID_PRIVATE_KEY}"
+  frontend:
+    image: registry.digitalocean.com/pooperhub/pooper/frontend:latest
+    depends_on:
+      - db
+      - api
+    restart: always
+    environment:
+      API_BASE_URL: ${API_BASE_URL}
+      VAPID_PUBLIC_KEY: ${VAPID_PUBLIC_KEY}
+      MAPBOX_ACCESS_TOKEN: ${MAPBOX_ACCESS_TOKEN}
+  nginx:
+    image: registry.digitalocean.com/pooperhub/pooper/nginx:latest
+    depends_on:
+      - api
+      - frontend
+    environment:
+      API_BASE_URL: ${API_BASE_URL}
+      API_CONTAINER_ADDRESS: ${API_CONTAINER_ADDRESS}
+      CLIENT_BASE_URL: ${CLIENT_BASE_URL}
+      FRONTEND_CONTAINER_ADDRESS: ${FRONTEND_CONTAINER_ADDRESS}
+      SERVER_NAME: ${SERVER_NAME}
+      SSL_CERTIFICATE_FILE: ${SSL_CERTIFICATE_FILE}
+      SSL_CERTIFICATE_KEY_FILE: ${SSL_CERTIFICATE_KEY_FILE}
+    restart: always

@@ -1,0 +1,37 @@
+version: "3.3"
+services:
+  db:
+    volumes:
+      - /home/martin/databases:/var/lib/mysql
+    network_mode: host
+  api:
+    build:
+      context: ./pooper-api
+    volumes:
+      - ./pooper-api/src:/usr/src/app/src
+    network_mode: host
+    command: uvicorn src.main:app --host 0.0.0.0 --reload --root-path $API_ROOT_PATH
+  frontend:
+    build:
+      context: ./pooper-frontend
+      target: develop-stage
+      args:
+        - API_BASE_URL=${API_BASE_URL}
+        - MAPBOX_ACCESS_TOKEN=${MAPBOX_ACCESS_TOKEN}
+        - SSL_CERTIFICATE_FILE=${SSL_CERTIFICATE_FILE}
+        - SSL_CERTIFICATE_KEY_FILE=${SSL_CERTIFICATE_KEY_FILE}
+    environment:
+      SSL_CERTIFICATE_FILE: /etc/ssl/${SSL_CERTIFICATE_FILE}
+      SSL_CERTIFICATE_KEY_FILE: /etc/ssl/${SSL_CERTIFICATE_KEY_FILE}
+    volumes:
+      - ./pooper-frontend:/usr/src/app
+      - ./pooper-frontend/node_modules:/usr/src/app/node_modules
+      - ./pooper-nginx/ssl:/etc/ssl
+    network_mode: host
+    command: yarn dev
+  nginx:
+    build:
+      context: ./pooper-nginx
+    volumes:
+      - ./pooper-nginx/ssl:/etc/nginx/ssl
+    network_mode: host
