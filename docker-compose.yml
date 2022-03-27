@@ -15,7 +15,6 @@ services:
       - db
     restart: always
     environment:
-      API_BASE_URL: "${API_BASE_URL}"
       API_ROOT_PATH: "${API_ROOT_PATH}"
       CLIENT_BASE_URL: "${CLIENT_BASE_URL}"
       API_SECRET_AUTH_KEY: "${API_SECRET_AUTH_KEY}"
