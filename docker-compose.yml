@@ -26,6 +26,8 @@ services:
       MARIADB_PASSWORD: "${MARIADB_PASSWORD}"
       VAPID_PUBLIC_KEY: "${VAPID_PUBLIC_KEY}"
       VAPID_PRIVATE_KEY: "${VAPID_PRIVATE_KEY}"
+    volumes:
+      - /var/pooper:/var/pooper
   frontend:
     image: registry.digitalocean.com/pooperhub/pooper/frontend:latest
     depends_on:
